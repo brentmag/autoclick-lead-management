@@ -1,0 +1,17 @@
+{
+  "name": "autoclick-lead-manager",
+  "version": "1.0.0",
+  "description": "Automotive lead management system",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "pg": "^8.11.3",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.7"
+  }
+}
