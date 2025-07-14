@@ -1,6 +1,6 @@
 
 
-json{
+{
   "name": "autoclick-lead-management",
   "version": "1.0.0",
   "description": "Multi-tenant Kanban workflow management system with CRM integration",
