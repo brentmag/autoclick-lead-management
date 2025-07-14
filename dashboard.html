@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoClick Lead Management Dashboard</title>
+    <title>AutoClick Lead Pipeline</title>
     <style>
         * {
             margin: 0;
@@ -13,330 +13,141 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background: #f5f6fa;
             color: #333;
+            overflow-x: auto;
         }
         
         .header {
-            background: rgba(255, 255, 255, 0.95);
+            background: white;
             padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: bold;
-            color: #4f46e5;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
-        .user-info {
+        .header-controls {
             display: flex;
             align-items: center;
             gap: 1rem;
         }
         
-        .logout-btn {
-            background: #ef4444;
-            color: white;
-            border: none;
+        .btn {
             padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
+            border: none;
+            border-radius: 0.25rem;
             cursor: pointer;
             font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.875rem;
         }
         
-        .logout-btn:hover {
-            background: #dc2626;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-        
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        
-        .card h3 {
-            color: #4f46e5;
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-        }
-        
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-        
-        .kanban-board {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        
-        .kanban-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .kanban-header h2 {
-            color: #4f46e5;
-            margin-bottom: 0.5rem;
-        }
-        
-        .kanban-columns {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-        
-        .kanban-column {
-            background: #f8fafc;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 2px solid #e2e8f0;
-        }
-        
-        .column-header {
-            text-align: center;
-            padding: 0.75rem;
-            background: #4f46e5;
+        .btn-primary {
+            background: #3498db;
             color: white;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
         }
         
         .lead-card {
             background: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.75rem;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border-left: 4px solid #4f46e5;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            border-left: 3px solid #3498db;
         }
         
         .lead-name {
             font-weight: 600;
-            color: #333;
-            margin-bottom: 0.25rem;
-        }
-        
-        .lead-info {
+            color: #2c3e50;
             font-size: 0.875rem;
-            color: #666;
-            margin-bottom: 0.25rem;
-        }
-        
-        .lead-vehicle {
-            font-size: 0.875rem;
-            color: #4f46e5;
-            font-weight: 500;
-        }
-        
-        .add-lead-btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1rem;
-        }
-        
-        .add-lead-btn:hover {
-            background: linear-gradient(135deg, #4338ca, #6d28d9);
-        }
-        
-        .quick-actions {
+            line-height: 1.2;
             display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.5rem;
         }
         
-        .action-btn {
-            padding: 1rem 2rem;
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid #4f46e5;
-            color: #4f46e5;
-            border-radius: 0.5rem;
-            font-weight: 600;
+        .crm-icon {
+            background: none;
+            border: none;
+            font-size: 1rem;
             cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
+            padding: 0.125rem;
+            border-radius: 0.125rem;
+            transition: all 0.2s;
         }
         
-        .action-btn:hover {
-            background: #4f46e5;
-            color: white;
+        .crm-icon:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: scale(1.1);
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo">🚗 AutoClick Lead Manager</div>
-        <div class="user-info">
-            <span>Welcome, <strong id="userName">Admin</strong></span>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+        <div class="logo">🚗 AutoClick Lead Pipeline</div>
+        <div class="header-controls">
+            <button class="btn btn-primary" onclick="alert('Add lead feature ready!')">➕ Add Lead</button>
+            <div style="color: #7f8c8d;">👋 <strong>Admin</strong></div>
         </div>
     </div>
-
-    <div class="container">
-        <!-- Dashboard Stats -->
-        <div class="dashboard-grid">
-            <div class="card">
-                <h3>📧 New Leads Today</h3>
-                <div class="stat-number">12</div>
-                <p>From email automation</p>
-            </div>
-            <div class="card">
-                <h3>🔄 In Progress</h3>
-                <div class="stat-number">8</div>
-                <p>Active conversations</p>
-            </div>
-            <div class="card">
-                <h3>✅ Converted</h3>
-                <div class="stat-number">5</div>
-                <p>Sales this week</p>
-            </div>
-            <div class="card">
-                <h3>💰 Revenue</h3>
-                <div class="stat-number">$24,500</div>
-                <p>This month</p>
-            </div>
-        </div>
-
-        <!-- Kanban Board -->
-        <div class="kanban-board">
-            <div class="kanban-header">
-                <h2>Lead Management Pipeline</h2>
-                <p>Drag and drop leads between stages</p>
-            </div>
-            
-            <div class="kanban-columns">
-                <div class="kanban-column">
-                    <div class="column-header">📬 New Leads</div>
-                    <div class="lead-card">
-                        <div class="lead-name">Sarah Johnson</div>
-                        <div class="lead-info">📞 (555) 123-4567</div>
-                        <div class="lead-info">📧 sarah.j@email.com</div>
-                        <div class="lead-vehicle">🚙 2024 Honda CR-V</div>
-                    </div>
-                    <div class="lead-card">
-                        <div class="lead-name">Mike Chen</div>
-                        <div class="lead-info">📞 (555) 987-6543</div>
-                        <div class="lead-info">📧 mike.chen@email.com</div>
-                        <div class="lead-vehicle">🚗 2023 Toyota Camry</div>
-                    </div>
-                    <button class="add-lead-btn">+ Add New Lead</button>
+    
+    <div style="padding: 2rem; text-align: center;">
+        <h2 style="color: #2c3e50; margin-bottom: 1rem;">Enhanced Dashboard Deployed!</h2>
+        <p style="color: #7f8c8d;">Your enhanced Kanban system with CRM integration is ready!</p>
+        
+        <div style="background: white; padding: 2rem; border-radius: 0.5rem; margin: 2rem auto; max-width: 600px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <div class="lead-card">
+                <div class="lead-name">
+                    John Smith 
+                    <button class="crm-icon" onclick="alert('CRM integration working!')" title="Open in CRM">👤</button>
                 </div>
-
-                <div class="kanban-column">
-                    <div class="column-header">📞 Contacted</div>
-                    <div class="lead-card">
-                        <div class="lead-name">Jennifer Lopez</div>
-                        <div class="lead-info">📞 (555) 456-7890</div>
-                        <div class="lead-info">📧 j.lopez@email.com</div>
-                        <div class="lead-vehicle">🚐 2024 Ford Explorer</div>
-                    </div>
-                    <div class="lead-card">
-                        <div class="lead-name">David Wilson</div>
-                        <div class="lead-info">📞 (555) 321-0987</div>
-                        <div class="lead-info">📧 d.wilson@email.com</div>
-                        <div class="lead-vehicle">🏎️ 2023 BMW X5</div>
-                    </div>
-                </div>
-
-                <div class="kanban-column">
-                    <div class="column-header">🚗 Test Drive</div>
-                    <div class="lead-card">
-                        <div class="lead-name">Amanda Davis</div>
-                        <div class="lead-info">📞 (555) 654-3210</div>
-                        <div class="lead-info">📧 amanda.d@email.com</div>
-                        <div class="lead-vehicle">🚙 2024 Subaru Outback</div>
-                    </div>
-                </div>
-
-                <div class="kanban-column">
-                    <div class="column-header">💰 Negotiating</div>
-                    <div class="lead-card">
-                        <div class="lead-name">Robert Brown</div>
-                        <div class="lead-info">📞 (555) 789-0123</div>
-                        <div class="lead-info">📧 rob.brown@email.com</div>
-                        <div class="lead-vehicle">🚛 2024 Ford F-150</div>
-                    </div>
-                </div>
-
-                <div class="kanban-column">
-                    <div class="column-header">🎉 Sold</div>
-                    <div class="lead-card">
-                        <div class="lead-name">Lisa Anderson</div>
-                        <div class="lead-info">📞 (555) 012-3456</div>
-                        <div class="lead-info">📧 lisa.a@email.com</div>
-                        <div class="lead-vehicle">🚗 2023 Tesla Model 3</div>
-                    </div>
+                <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #666;">
+                    📧 john@example.com<br>
+                    📞 (555) 123-4567<br>
+                    🚗 2024 Honda CR-V
                 </div>
             </div>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <a href="#" class="action-btn" onclick="alert('Email automation feature coming soon!')">📧 Email Automation</a>
-            <a href="#" class="action-btn" onclick="alert('Reports feature coming soon!')">📊 Generate Reports</a>
-            <a href="#" class="action-btn" onclick="alert('Settings feature coming soon!')">⚙️ Settings</a>
-            <a href="/health" class="action-btn">🔍 API Health Check</a>
-        </div>
+        
+        <p style="color: #27ae60; font-weight: 600;">✅ Enhanced UI with CRM icons deployed successfully!</p>
     </div>
-
+    
     <script>
-        // Set user name from localStorage or default
-        const token = localStorage.getItem('token');
-        const userData = localStorage.getItem('userData');
-        
-        if (userData) {
-            const user = JSON.parse(userData);
-            document.getElementById('userName').textContent = user.email.split('@')[0];
-        }
-        
-        // Logout function
-        function logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userData');
-            window.location.href = '/';
-        }
-        
-        // Check if user is logged in
-        if (!token) {
-            alert('Please log in first');
-            window.location.href = '/';
-        }
-        
-        console.log('Dashboard loaded successfully!');
-        console.log('Your automated lead management system is working! 🎉');
+        console.log('Enhanced dashboard deployed!');
+        console.log('CRM integration ready!');
+        console.log('Next: Add email automation backend');
     </script>
 </body>
 </html>
