@@ -5,149 +5,96 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoClick Lead Pipeline</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f6fa;
-            color: #333;
-            overflow-x: auto;
-        }
-        
-        .header {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-        
-        .logo {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .header-controls {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 0.25rem;
-            cursor: pointer;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.2s;
-            font-size: 0.875rem;
-        }
-        
-        .btn-primary {
-            background: #3498db;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #2980b9;
-        }
-        
-        .btn-secondary {
-            background: #95a5a6;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #7f8c8d;
-        }
-        
-        .lead-card {
-            background: white;
-            border-radius: 0.375rem;
-            padding: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            border-left: 3px solid #3498db;
-        }
-        
-        .lead-name {
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 0.875rem;
-            line-height: 1.2;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .crm-icon {
-            background: none;
-            border: none;
-            font-size: 1rem;
-            cursor: pointer;
-            padding: 0.125rem;
-            border-radius: 0.125rem;
-            transition: all 0.2s;
-        }
-        
-        .crm-icon:hover {
-            background: rgba(52, 152, 219, 0.1);
-            transform: scale(1.1);
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f5f6fa; }
+        .header { background: white; padding: 1rem 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.25rem; font-weight: bold; color: #2c3e50; }
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: 500; }
+        .btn-primary { background: #3498db; color: white; }
+        .kanban-board { display: flex; gap: 1rem; padding: 2rem; overflow-x: auto; }
+        .kanban-column { min-width: 280px; background: #ecf0f1; border-radius: 0.5rem; }
+        .column-header { padding: 1rem; background: #34495e; color: white; border-radius: 0.5rem 0.5rem 0 0; text-align: center; }
+        .column-body { padding: 0.5rem; min-height: 400px; }
+        .lead-card { background: white; border-radius: 0.375rem; padding: 0.75rem; margin-bottom: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 3px solid #3498db; }
+        .lead-name { font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .crm-icon { background: none; border: none; font-size: 1rem; cursor: pointer; }
+        .crm-icon:hover { background: rgba(52, 152, 219, 0.1); border-radius: 0.125rem; }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="logo">🚗 AutoClick Lead Pipeline</div>
-        <div class="header-controls">
-            <button class="btn btn-primary" onclick="alert('Add lead feature ready!')">➕ Add Lead</button>
-            <div style="color: #7f8c8d;">👋 <strong>Admin</strong></div>
+        <div>
+            <button class="btn btn-primary" onclick="openAddLeadModal()">➕ Add Lead</button>
+            <span style="margin-left: 1rem;">👋 <strong id="userName">Admin</strong></span>
+            <button class="btn" onclick="logout()" style="background: #95a5a6; color: white; margin-left: 0.5rem;">Logout</button>
         </div>
     </div>
-    
-    <div style="padding: 2rem; text-align: center;">
-        <h2 style="color: #2c3e50; margin-bottom: 1rem;">Enhanced Dashboard Deployed!</h2>
-        <p style="color: #7f8c8d;">Your enhanced Kanban system with CRM integration is ready!</p>
-        
-        <div style="background: white; padding: 2rem; border-radius: 0.5rem; margin: 2rem auto; max-width: 600px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-            <div class="lead-card">
-                <div class="lead-name">
-                    John Smith 
-                    <button class="crm-icon" onclick="alert('CRM integration working!')" title="Open in CRM">👤</button>
-                </div>
-                <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #666;">
-                    📧 john@example.com<br>
-                    📞 (555) 123-4567<br>
-                    🚗 2024 Honda CR-V
+
+    <div class="kanban-board" id="kanbanBoard">
+        <div class="kanban-column">
+            <div class="column-header">New Leads</div>
+            <div class="column-body">
+                <div class="lead-card">
+                    <div class="lead-name">John Smith <button class="crm-icon" onclick="alert('CRM integration working!')" title="Open in CRM">👤</button></div>
+                    <div>📧 john@example.com</div>
+                    <div>📞 (555) 123-4567</div>
+                    <div>🚗 2024 Honda CR-V</div>
                 </div>
             </div>
         </div>
         
-        <p style="color: #27ae60; font-weight: 600;">✅ Enhanced UI with CRM icons deployed successfully!</p>
+        <div class="kanban-column">
+            <div class="column-header">Contacted</div>
+            <div class="column-body"></div>
+        </div>
+        
+        <div class="kanban-column">
+            <div class="column-header">Qualified</div>
+            <div class="column-body"></div>
+        </div>
+        
+        <div class="kanban-column">
+            <div class="column-header">Closed Won</div>
+            <div class="column-body"></div>
+        </div>
     </div>
-    
+
     <script>
-        console.log('Enhanced dashboard deployed!');
-        console.log('CRM integration ready!');
-        console.log('Next: Add email automation backend');
+        function openAddLeadModal() {
+            const name = prompt('Lead Name:');
+            const email = prompt('Email:');
+            const phone = prompt('Phone:');
+            const vehicle = prompt('Vehicle Interest:');
+            const crmUrl = prompt('CRM URL (optional):');
+            
+            if (name && email) {
+                const newLeadCard = document.createElement('div');
+                newLeadCard.className = 'lead-card';
+                newLeadCard.innerHTML = `
+                    <div class="lead-name">
+                        ${name} 
+                        ${crmUrl ? `<button class="crm-icon" onclick="window.open('${crmUrl}', '_blank')" title="Open in CRM">👤</button>` : ''}
+                    </div>
+                    <div>📧 ${email}</div>
+                    ${phone ? `<div>📞 ${phone}</div>` : ''}
+                    ${vehicle ? `<div>🚗 ${vehicle}</div>` : ''}
+                `;
+                
+                const firstColumn = document.querySelector('.column-body');
+                firstColumn.appendChild(newLeadCard);
+                
+                alert('Lead added successfully!');
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userData'); 
+            window.location.href = '/';
+        }
+        
+        console.log('Enhanced Kanban system loaded!');
     </script>
 </body>
 </html>
