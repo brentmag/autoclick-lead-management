@@ -5,96 +5,1063 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoClick Lead Pipeline</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f5f6fa; }
-        .header { background: white; padding: 1rem 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.25rem; font-weight: bold; color: #2c3e50; }
-        .btn { padding: 0.5rem 1rem; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: 500; }
-        .btn-primary { background: #3498db; color: white; }
-        .kanban-board { display: flex; gap: 1rem; padding: 2rem; overflow-x: auto; }
-        .kanban-column { min-width: 280px; background: #ecf0f1; border-radius: 0.5rem; }
-        .column-header { padding: 1rem; background: #34495e; color: white; border-radius: 0.5rem 0.5rem 0 0; text-align: center; }
-        .column-body { padding: 0.5rem; min-height: 400px; }
-        .lead-card { background: white; border-radius: 0.375rem; padding: 0.75rem; margin-bottom: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-left: 3px solid #3498db; }
-        .lead-name { font-weight: 600; color: #2c3e50; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-        .crm-icon { background: none; border: none; font-size: 1rem; cursor: pointer; }
-        .crm-icon:hover { background: rgba(52, 152, 219, 0.1); border-radius: 0.125rem; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            color: #333;
+            overflow-x: auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-filter {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 0.25rem;
+            background: white;
+            min-width: 150px;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #7f8c8d;
+        }
+        
+        /* Kanban Board */
+        .kanban-container {
+            padding: 1rem;
+            height: calc(100vh - 80px);
+            overflow: hidden;
+        }
+        
+        .kanban-board {
+            display: flex;
+            gap: 1rem;
+            height: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 1rem;
+        }
+        
+        .kanban-column {
+            min-width: 280px;
+            max-width: 280px;
+            background: #ecf0f1;
+            border-radius: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        
+        .column-header {
+            padding: 1rem;
+            background: #34495e;
+            color: white;
+            border-radius: 0.5rem 0.5rem 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .column-header.editable {
+            background: #27ae60;
+        }
+        
+        .column-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .column-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            min-width: 1.5rem;
+            text-align: center;
+        }
+        
+        .column-body {
+            flex: 1;
+            padding: 0.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .column-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .column-body::-webkit-scrollbar-track {
+            background: #ecf0f1;
+        }
+        
+        .column-body::-webkit-scrollbar-thumb {
+            background: #bdc3c7;
+            border-radius: 3px;
+        }
+        
+        /* Lead Cards */
+        .lead-card {
+            background: white;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            border-left: 3px solid #3498db;
+        }
+        
+        .lead-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+        
+        .lead-card.dragging {
+            opacity: 0.6;
+            transform: rotate(2deg);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .lead-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+        
+        .lead-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.875rem;
+            line-height: 1.2;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .crm-icon {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.125rem;
+            border-radius: 0.125rem;
+            transition: all 0.2s;
+        }
+        
+        .crm-icon:hover {
+            background: rgba(52, 152, 219, 0.1);
+            transform: scale(1.1);
+        }
+        
+        .lead-actions {
+            opacity: 0;
+            transition: opacity 0.2s;
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .lead-card:hover .lead-actions {
+            opacity: 1;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            padding: 0.125rem;
+            cursor: pointer;
+            border-radius: 0.125rem;
+            color: #7f8c8d;
+            font-size: 0.75rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            background: #ecf0f1;
+            color: #2c3e50;
+        }
+        
+        .edit-btn:hover {
+            color: #f39c12;
+        }
+        
+        .delete-btn:hover {
+            color: #e74c3c;
+        }
+        
+        .lead-details {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+            line-height: 1.3;
+        }
+        
+        .lead-detail-row {
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+        
+        .lead-vehicle {
+            color: #3498db;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+        
+        .lead-followup {
+            background: #e8f4fd;
+            color: #2980b9;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            margin: 0.25rem 0;
+        }
+        
+        .lead-next-action {
+            background: #e8f5e8;
+            color: #27ae60;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            margin: 0.25rem 0;
+        }
+        
+        .lead-priority {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin: 0.25rem 0;
+        }
+        
+        .priority-high {
+            background: #fdf2f2;
+            color: #e53e3e;
+        }
+        
+        .priority-low {
+            background: #fffbeb;
+            color: #d69e2e;
+        }
+        
+        .lead-assigned {
+            background: #e8f4fd;
+            color: #3498db;
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.75rem;
+            font-size: 0.625rem;
+            font-weight: 500;
+            margin-top: 0.375rem;
+            display: inline-block;
+        }
+        
+        .lead-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            padding-top: 0.375rem;
+            border-top: 1px solid #ecf0f1;
+            font-size: 0.625rem;
+            color: #95a5a6;
+        }
+        
+        .lead-quick-actions {
+            display: flex;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #ecf0f1;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .lead-card:hover .lead-quick-actions {
+            opacity: 1;
+        }
+        
+        .quick-action-btn {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 0.25rem;
+            padding: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .quick-action-btn:hover {
+            background: #e9ecef;
+            border-color: #3498db;
+        }
+        
+        /* Add Lead Button */
+        .add-lead-btn {
+            background: #ecf0f1;
+            border: 2px dashed #bdc3c7;
+            border-radius: 0.375rem;
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            color: #7f8c8d;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .add-lead-btn:hover {
+            background: #d5dbdb;
+            border-color: #95a5a6;
+            color: #2c3e50;
+        }
+        
+        /* Drag and Drop */
+        .column-drop-zone {
+            min-height: 2rem;
+            border-radius: 0.375rem;
+            transition: all 0.2s;
+        }
+        
+        .column-drop-zone.drag-over {
+            background: rgba(52, 152, 219, 0.1);
+            border: 2px dashed #3498db;
+        }
+        
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .modal-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #95a5a6;
+            padding: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.25rem;
+        }
+        
+        .close-btn:hover {
+            background: #ecf0f1;
+            color: #7f8c8d;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 0.875rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ecf0f1;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.75rem 1rem;
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .header-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .kanban-container {
+                padding: 0.5rem;
+                height: calc(100vh - 120px);
+            }
+            
+            .kanban-column {
+                min-width: 260px;
+                max-width: 260px;
+            }
+        }
+        
+        /* Loading and alerts */
+        .alert {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            z-index: 3000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo">🚗 AutoClick Lead Pipeline</div>
-        <div>
-            <button class="btn btn-primary" onclick="openAddLeadModal()">➕ Add Lead</button>
-            <span style="margin-left: 1rem;">👋 <strong id="userName">Admin</strong></span>
-            <button class="btn" onclick="logout()" style="background: #95a5a6; color: white; margin-left: 0.5rem;">Logout</button>
+        <div class="logo">
+            🚗 AutoClick Lead Pipeline
+        </div>
+        <div class="header-controls">
+            <select class="user-filter" id="userFilter">
+                <option value="">All Team Members</option>
+            </select>
+            <button class="btn btn-primary" id="addLeadBtn">
+                ➕ Add Lead
+            </button>
+            <button class="btn btn-secondary" id="addUserBtn" style="display: none;">
+                👤 Add User
+            </button>
+            <div class="user-info">
+                <span>👋 <strong id="userName">User</strong></span>
+                <button class="btn btn-secondary btn-small" id="logoutBtn">Logout</button>
+            </div>
         </div>
     </div>
 
-    <div class="kanban-board" id="kanbanBoard">
-        <div class="kanban-column">
-            <div class="column-header">New Leads</div>
-            <div class="column-body">
-                <div class="lead-card">
-                    <div class="lead-name">John Smith <button class="crm-icon" onclick="alert('CRM integration working!')" title="Open in CRM">👤</button></div>
-                    <div>📧 john@example.com</div>
-                    <div>📞 (555) 123-4567</div>
-                    <div>🚗 2024 Honda CR-V</div>
-                </div>
+    <div class="kanban-container">
+        <div id="kanbanBoard" class="kanban-board">
+            <!-- Columns will be dynamically generated -->
+        </div>
+    </div>
+
+    <!-- Add/Edit Lead Modal -->
+    <div id="leadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="leadModalTitle">Add New Lead</h3>
+                <button class="close-btn" id="closeLeadModal">&times;</button>
             </div>
-        </div>
-        
-        <div class="kanban-column">
-            <div class="column-header">Contacted</div>
-            <div class="column-body"></div>
-        </div>
-        
-        <div class="kanban-column">
-            <div class="column-header">Qualified</div>
-            <div class="column-body"></div>
-        </div>
-        
-        <div class="kanban-column">
-            <div class="column-header">Closed Won</div>
-            <div class="column-body"></div>
+            <form id="leadForm">
+                <div class="form-group">
+                    <label class="form-label">Lead Name *</label>
+                    <input type="text" class="form-input" id="leadName" required placeholder="John Smith">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-input" id="leadEmail" required placeholder="john@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" id="leadPhone" placeholder="(555) 123-4567">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Vehicle Interest</label>
+                    <input type="text" class="form-input" id="leadVehicle" placeholder="2024 Honda CR-V">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Assign to Sales Rep</label>
+                    <select class="form-input" id="leadAssignedTo">
+                        <option value="">Unassigned</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">CRM Record URL</label>
+                    <input type="url" class="form-input" id="leadCrmUrl" placeholder="https://your-crm.com/contact/123">
+                    <small style="color: #7f8c8d; font-size: 0.75rem;">Link to this lead's record in your CRM system</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priority Level</label>
+                    <select class="form-input" id="leadPriority">
+                        <option value="medium">Medium Priority</option>
+                        <option value="high">High Priority</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Next Follow-up Date</label>
+                    <input type="date" class="form-input" id="leadFollowupDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Follow-up Time</label>
+                    <input type="time" class="form-input" id="leadFollowupTime">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Next Action Needed</label>
+                    <input type="text" class="form-input" id="leadNextAction" placeholder="Call to schedule demo">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Lead Source</label>
+                    <select class="form-input" id="leadSource">
+                        <option value="website">Website</option>
+                        <option value="email">Email</option>
+                        <option value="phone">Phone Call</option>
+                        <option value="referral">Referral</option>
+                        <option value="walk-in">Walk-in</option>
+                        <option value="social">Social Media</option>
+                        <option value="advertising">Advertising</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelLeadBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="leadSubmitBtn">Add Lead</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
-        function openAddLeadModal() {
-            const name = prompt('Lead Name:');
-            const email = prompt('Email:');
-            const phone = prompt('Phone:');
-            const vehicle = prompt('Vehicle Interest:');
-            const crmUrl = prompt('CRM URL (optional):');
+        // Global variables
+        let currentUser = { id: 1, name: 'Admin', role: 'admin' };
+        let allLeads = [];
+        let allUsers = [
+            { id: 1, name: 'Admin User', email: 'admin@autoclick.com', role: 'admin' },
+            { id: 2, name: 'John Sales', email: 'john@autoclick.com', role: 'sales_rep' },
+            { id: 3, name: 'Sarah Manager', email: 'sarah@autoclick.com', role: 'manager' }
+        ];
+        let currentEditingLead = null;
+        let leadIdCounter = 1;
+        
+        // Editable pipeline columns
+        let pipelineColumns = [
+            { id: 'new', title: 'New Leads', color: '#3498db' },
+            { id: 'contacted', title: 'Contacted', color: '#9b59b6' },
+            { id: 'qualified', title: 'Qualified', color: '#f39c12' },
+            { id: 'demo', title: 'Demo Scheduled', color: '#e67e22' },
+            { id: 'proposal', title: 'Proposal Sent', color: '#e74c3c' },
+            { id: 'negotiating', title: 'Negotiating', color: '#34495e' },
+            { id: 'closed_won', title: 'Closed Won', color: '#27ae60' },
+            { id: 'closed_lost', title: 'Closed Lost', color: '#95a5a6' }
+        ];
+
+        // Sample leads
+        allLeads = [
+            {
+                id: 1,
+                name: 'John Smith',
+                email: 'john@example.com',
+                phone: '(555) 123-4567',
+                vehicle_interest: '2024 Honda CR-V',
+                status: 'new',
+                assigned_to: 2,
+                source: 'website',
+                priority: 'high',
+                next_followup_date: '2025-07-15',
+                next_followup_time: '14:00',
+                next_action: 'Schedule test drive',
+                crm_url: 'https://your-crm.com/contact/12345',
+                created_at: '2025-07-14T10:30:00Z'
+            },
+            {
+                id: 2,
+                name: 'Sarah Johnson',
+                email: 'sarah@example.com',
+                phone: '(555) 987-6543',
+                vehicle_interest: '2024 Toyota Camry',
+                status: 'contacted',
+                assigned_to: 3,
+                source: 'phone',
+                priority: 'medium',
+                created_at: '2025-07-13T15:20:00Z'
+            }
+        ];
+
+        // Initialize app
+        function initApp() {
+            console.log('🚀 Enhanced Kanban Lead Management System loading...');
             
-            if (name && email) {
-                const newLeadCard = document.createElement('div');
-                newLeadCard.className = 'lead-card';
-                newLeadCard.innerHTML = `
-                    <div class="lead-name">
-                        ${name} 
-                        ${crmUrl ? `<button class="crm-icon" onclick="window.open('${crmUrl}', '_blank')" title="Open in CRM">👤</button>` : ''}
+            // Set user name
+            document.getElementById('userName').textContent = currentUser.name;
+            
+            // Show admin features if user is admin
+            if (currentUser.role === 'admin') {
+                document.getElementById('addUserBtn').style.display = 'block';
+            }
+            
+            // Populate user filter
+            updateUserFilterOptions();
+            
+            // Render pipeline
+            renderPipeline();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            console.log('✅ Enhanced Kanban system initialized successfully!');
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Add Lead button
+            document.getElementById('addLeadBtn').addEventListener('click', openAddLeadModal);
+            
+            // Close modal buttons
+            document.getElementById('closeLeadModal').addEventListener('click', () => closeModal('leadModal'));
+            document.getElementById('cancelLeadBtn').addEventListener('click', () => closeModal('leadModal'));
+            
+            // Lead form submission
+            document.getElementById('leadForm').addEventListener('submit', handleLeadSubmit);
+            
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            
+            // User filter
+            document.getElementById('userFilter').addEventListener('change', filterLeadsByUser);
+            
+            // Close modals when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target.classList.contains('modal')) {
+                    event.target.classList.remove('active');
+                }
+            });
+        }
+
+        // Pipeline rendering functions
+        function renderPipeline() {
+            const board = document.getElementById('kanbanBoard');
+            board.innerHTML = '';
+
+            pipelineColumns.forEach(column => {
+                const columnElement = createColumnElement(column);
+                board.appendChild(columnElement);
+            });
+        }
+
+        function createColumnElement(column) {
+            const columnDiv = document.createElement('div');
+            columnDiv.className = 'kanban-column';
+            columnDiv.setAttribute('data-column-id', column.id);
+
+            const leadsInColumn = getLeadsForColumn(column.id);
+
+            columnDiv.innerHTML = `
+                <div class="column-header" style="background: ${column.color}">
+                    <span class="column-title">${column.title}</span>
+                    <span class="column-count">${leadsInColumn.length}</span>
+                </div>
+                <div class="column-body">
+                    ${leadsInColumn.map(lead => createLeadCard(lead)).join('')}
+                    <div class="add-lead-btn" onclick="openAddLeadModal('${column.id}')">
+                        ➕ Add Lead Here
                     </div>
-                    <div>📧 ${email}</div>
-                    ${phone ? `<div>📞 ${phone}</div>` : ''}
-                    ${vehicle ? `<div>🚗 ${vehicle}</div>` : ''}
-                `;
-                
-                const firstColumn = document.querySelector('.column-body');
-                firstColumn.appendChild(newLeadCard);
-                
-                alert('Lead added successfully!');
+                </div>
+            `;
+
+            return columnDiv;
+        }
+
+        function createLeadCard(lead) {
+            const assignedUser = allUsers.find(u => u.id === lead.assigned_to);
+            
+            return `
+                <div class="lead-card" data-lead-id="${lead.id}">
+                    <div class="lead-header">
+                        <div class="lead-name">
+                            ${lead.name}
+                            ${lead.crm_url ? `<button class="crm-icon" onclick="openCrmLink('${lead.crm_url}')" title="Open in CRM">👤</button>` : ''}
+                        </div>
+                        <div class="lead-actions">
+                            <button class="action-btn edit-btn" onclick="editLead(${lead.id})" title="Edit Lead">✏️</button>
+                            <button class="action-btn delete-btn" onclick="deleteLead(${lead.id})" title="Delete Lead">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="lead-details">
+                        <div class="lead-detail-row">📧 ${lead.email}</div>
+                        ${lead.phone ? `<div class="lead-detail-row">📞 ${lead.phone}</div>` : ''}
+                        ${lead.vehicle_interest ? `<div class="lead-vehicle">🚗 ${lead.vehicle_interest}</div>` : ''}
+                        
+                        ${lead.next_followup_date ? `
+                            <div class="lead-followup">
+                                📅 Follow-up: ${formatDate(lead.next_followup_date)} ${lead.next_followup_time || ''}
+                            </div>
+                        ` : ''}
+                        
+                        ${lead.next_action ? `
+                            <div class="lead-next-action">
+                                ✅ Next: ${lead.next_action}
+                            </div>
+                        ` : ''}
+                        
+                        ${lead.priority && lead.priority !== 'medium' ? `
+                            <div class="lead-priority priority-${lead.priority}">
+                                ${lead.priority === 'high' ? '🔴 High Priority' : '🟡 Low Priority'}
+                            </div>
+                        ` : ''}
+                        
+                        ${assignedUser ? `<div class="lead-assigned">👤 ${assignedUser.name}</div>` : ''}
+                    </div>
+                    <div class="lead-meta">
+                        <span>${lead.source || 'Unknown'}</span>
+                        <span>${formatDate(lead.created_at)}</span>
+                    </div>
+                    
+                    <div class="lead-quick-actions">
+                        <button class="quick-action-btn" onclick="scheduleFollowup(${lead.id})" title="Schedule Follow-up">📅</button>
+                        <button class="quick-action-btn" onclick="addTask(${lead.id})" title="Add Task">✅</button>
+                        <button class="quick-action-btn" onclick="addNote(${lead.id})" title="Add Note">📝</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function getLeadsForColumn(columnId) {
+            let filteredLeads = allLeads.filter(lead => lead.status === columnId);
+            
+            // Apply user filter if selected
+            const userFilter = document.getElementById('userFilter')?.value;
+            if (userFilter) {
+                filteredLeads = filteredLeads.filter(lead => lead.assigned_to == userFilter);
+            }
+            
+            return filteredLeads;
+        }
+
+        // Modal functions
+        function openAddLeadModal(defaultStatus = 'new') {
+            currentEditingLead = null;
+            document.getElementById('leadModalTitle').textContent = 'Add New Lead';
+            document.getElementById('leadSubmitBtn').textContent = 'Add Lead';
+            document.getElementById('leadForm').reset();
+            document.getElementById('leadForm').setAttribute('data-default-status', defaultStatus);
+            
+            populateAssignOptions();
+            openModal('leadModal');
+        }
+
+        function editLead(leadId) {
+            const lead = allLeads.find(l => l.id == leadId);
+            if (!lead) return;
+            
+            currentEditingLead = lead;
+            document.getElementById('leadModalTitle').textContent = 'Edit Lead';
+            document.getElementById('leadSubmitBtn').textContent = 'Update Lead';
+            
+            // Populate form
+            document.getElementById('leadName').value = lead.name || '';
+            document.getElementById('leadEmail').value = lead.email || '';
+            document.getElementById('leadPhone').value = lead.phone || '';
+            document.getElementById('leadVehicle').value = lead.vehicle_interest || '';
+            document.getElementById('leadAssignedTo').value = lead.assigned_to || '';
+            document.getElementById('leadCrmUrl').value = lead.crm_url || '';
+            document.getElementById('leadSource').value = lead.source || 'website';
+            document.getElementById('leadPriority').value = lead.priority || 'medium';
+            document.getElementById('leadFollowupDate').value = lead.next_followup_date || '';
+            document.getElementById('leadFollowupTime').value = lead.next_followup_time || '';
+            document.getElementById('leadNextAction').value = lead.next_action || '';
+            
+            populateAssignOptions();
+            openModal('leadModal');
+        }
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Form submission
+        function handleLeadSubmit(event) {
+            event.preventDefault();
+            
+            const defaultStatus = document.getElementById('leadForm').getAttribute('data-default-status') || 'new';
+            
+            const leadData = {
+                name: document.getElementById('leadName').value,
+                email: document.getElementById('leadEmail').value,
+                phone: document.getElementById('leadPhone').value,
+                vehicle_interest: document.getElementById('leadVehicle').value,
+                assigned_to: parseInt(document.getElementById('leadAssignedTo').value) || null,
+                crm_url: document.getElementById('leadCrmUrl').value,
+                source: document.getElementById('leadSource').value,
+                priority: document.getElementById('leadPriority').value,
+                next_followup_date: document.getElementById('leadFollowupDate').value || null,
+                next_followup_time: document.getElementById('leadFollowupTime').value || null,
+                next_action: document.getElementById('leadNextAction').value,
+                status: currentEditingLead ? currentEditingLead.status : defaultStatus
+            };
+
+            if (currentEditingLead) {
+                // Update existing lead
+                Object.assign(currentEditingLead, leadData);
+                showAlert('Lead updated successfully!', 'success');
+            } else {
+                // Create new lead
+                leadData.id = ++leadIdCounter;
+                leadData.created_at = new Date().toISOString();
+                allLeads.push(leadData);
+                showAlert('Lead added successfully!', 'success');
+            }
+            
+            renderPipeline();
+            closeModal('leadModal');
+        }
+
+        // Helper functions
+        function populateAssignOptions() {
+            const select = document.getElementById('leadAssignedTo');
+            select.innerHTML = '<option value="">Unassigned</option>';
+            
+            allUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.name || user.email;
+                select.appendChild(option);
+            });
+        }
+
+        function updateUserFilterOptions() {
+            const select = document.getElementById('userFilter');
+            if (!select) return;
+            
+            select.innerHTML = '<option value="">All Team Members</option>';
+            
+            allUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.name || user.email;
+                select.appendChild(option);
+            });
+        }
+
+        function filterLeadsByUser() {
+            renderPipeline();
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 4000);
+        }
+
+        function openCrmLink(url) {
+            if (url) {
+                window.open(url, '_blank');
+                showAlert('Opening CRM record...', 'success');
             }
         }
-        
-        function logout() {
-            localStorage.removeItem('token');
-            localStorage.removeItem('userData'); 
-            window.location.href = '/';
+
+        function deleteLead(leadId) {
+            if (!confirm('Are you sure you want to delete this lead?')) return;
+            
+            const index = allLeads.findIndex(l => l.id == leadId);
+            if (index !== -1) {
+                allLeads.splice(index, 1);
+                renderPipeline();
+                showAlert('Lead deleted successfully!', 'success');
+            }
         }
-        
-        console.log('Enhanced Kanban system loaded!');
+
+        // Quick action functions
+        function scheduleFollowup(leadId) {
+            const date = prompt('Follow-up date (YYYY-MM-DD):');
+            const time = prompt('Follow-up time (HH:MM):');
+            
+            if (date) {
+                const lead = allLeads.find(l => l.id == leadId);
+                if (lead) {
+                    lead.next_followup_date = date;
+                    lead.next_followup_time = time;
+                    renderPipeline();
+                    showAlert('Follow-up scheduled!', 'success');
+                }
+            }
+        }
+
+        function addTask(leadId) {
+            const task = prompt('What task needs to be done?');
+            if (task) {
+                const lead = allLeads.find(l => l.id == leadId);
+                if (lead) {
+                    lead.next_action = task;
+                    renderPipeline();
+                    showAlert('Task added!', 'success');
+                }
+            }
+        }
+
+        function addNote(leadId) {
+            const note = prompt('Add a note:');
+            if (note) {
+                showAlert('Note added! (Feature can be enhanced)', 'success');
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/';
+            }
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
