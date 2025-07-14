@@ -665,403 +665,130 @@
 
     <script>
         // Global variables
-        let currentUser = { id: 1, name: 'Admin', role: 'admin' };
-        let allLeads = [];
-        let allUsers = [
-            { id: 1, name: 'Admin User', email: 'admin@autoclick.com', role: 'admin' },
-            { id: 2, name: 'John Sales', email: 'john@autoclick.com', role: 'sales_rep' },
-            { id: 3, name: 'Sarah Manager', email: 'sarah@autoclick.com', role: 'manager' }
-        ];
-        let currentEditingLead = null;
-        let leadIdCounter = 1;
+     let allLeads = [
+    {id: 1, name: 'John Smith', email: 'john@example.com', phone: '(555) 123-4567', vehicle_interest: '2024 Honda CR-V', status: 'new', crm_url: 'https://your-crm.com/contact/12345'},
+    {id: 2, name: 'Sarah Johnson', email: 'sarah@example.com', phone: '(555) 987-6543', vehicle_interest: '2024 Toyota Camry', status: 'contacted'}
+];
+
+let pipelineColumns = [
+    { id: 'new', title: 'New Leads', color: '#3498db' },
+    { id: 'contacted', title: 'Contacted', color: '#9b59b6' },
+    { id: 'qualified', title: 'Qualified', color: '#f39c12' },
+    { id: 'demo', title: 'Demo Scheduled', color: '#e67e22' },
+    { id: 'proposal', title: 'Proposal Sent', color: '#e74c3c' },
+    { id: 'negotiating', title: 'Negotiating', color: '#34495e' },
+    { id: 'closed_won', title: 'Closed Won', color: '#27ae60' },
+    { id: 'closed_lost', title: 'Closed Lost', color: '#95a5a6' }
+];
+
+let leadCounter = 3;
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Dashboard loading...');
+    
+    // Add Lead button
+    document.getElementById('addLeadBtn').onclick = function() {
+        console.log('Add Lead clicked');
+        openLeadModal();
+    };
+    
+    // Form submission
+    document.getElementById('leadForm').onsubmit = function(e) {
+        e.preventDefault();
+        console.log('Form submitted');
         
-        // Editable pipeline columns
-        let pipelineColumns = [
-            { id: 'new', title: 'New Leads', color: '#3498db' },
-            { id: 'contacted', title: 'Contacted', color: '#9b59b6' },
-            { id: 'qualified', title: 'Qualified', color: '#f39c12' },
-            { id: 'demo', title: 'Demo Scheduled', color: '#e67e22' },
-            { id: 'proposal', title: 'Proposal Sent', color: '#e74c3c' },
-            { id: 'negotiating', title: 'Negotiating', color: '#34495e' },
-            { id: 'closed_won', title: 'Closed Won', color: '#27ae60' },
-            { id: 'closed_lost', title: 'Closed Lost', color: '#95a5a6' }
-        ];
-
-        // Sample leads
-        allLeads = [
-            {
-                id: 1,
-                name: 'John Smith',
-                email: 'john@example.com',
-                phone: '(555) 123-4567',
-                vehicle_interest: '2024 Honda CR-V',
-                status: 'new',
-                assigned_to: 2,
-                source: 'website',
-                priority: 'high',
-                next_followup_date: '2025-07-15',
-                next_followup_time: '14:00',
-                next_action: 'Schedule test drive',
-                crm_url: 'https://your-crm.com/contact/12345',
-                created_at: '2025-07-14T10:30:00Z'
-            },
-            {
-                id: 2,
-                name: 'Sarah Johnson',
-                email: 'sarah@example.com',
-                phone: '(555) 987-6543',
-                vehicle_interest: '2024 Toyota Camry',
-                status: 'contacted',
-                assigned_to: 3,
-                source: 'phone',
-                priority: 'medium',
-                created_at: '2025-07-13T15:20:00Z'
-            }
-        ];
-
-        // Initialize app
-        function initApp() {
-            console.log('🚀 Enhanced Kanban Lead Management System loading...');
-            
-            // Set user name
-            document.getElementById('userName').textContent = currentUser.name;
-            
-            // Show admin features if user is admin
-            if (currentUser.role === 'admin') {
-                document.getElementById('addUserBtn').style.display = 'block';
-            }
-            
-            // Populate user filter
-            updateUserFilterOptions();
-            
-            // Render pipeline
-            renderPipeline();
-            
-            // Setup event listeners
-            setupEventListeners();
-            
-            console.log('✅ Enhanced Kanban system initialized successfully!');
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Add Lead button
-            document.getElementById('addLeadBtn').addEventListener('click', openAddLeadModal);
-            
-            // Close modal buttons
-            document.getElementById('closeLeadModal').addEventListener('click', () => closeModal('leadModal'));
-            document.getElementById('cancelLeadBtn').addEventListener('click', () => closeModal('leadModal'));
-            
-            // Lead form submission
-            document.getElementById('leadForm').addEventListener('submit', handleLeadSubmit);
-            
-            // Logout button
-            document.getElementById('logoutBtn').addEventListener('click', logout);
-            
-            // User filter
-            document.getElementById('userFilter').addEventListener('change', filterLeadsByUser);
-            
-            // Close modals when clicking outside
-            window.addEventListener('click', function(event) {
-                if (event.target.classList.contains('modal')) {
-                    event.target.classList.remove('active');
-                }
-            });
-        }
-
-        // Pipeline rendering functions
-        function renderPipeline() {
-            const board = document.getElementById('kanbanBoard');
-            board.innerHTML = '';
-
-            pipelineColumns.forEach(column => {
-                const columnElement = createColumnElement(column);
-                board.appendChild(columnElement);
-            });
-        }
-
-        function createColumnElement(column) {
-            const columnDiv = document.createElement('div');
-            columnDiv.className = 'kanban-column';
-            columnDiv.setAttribute('data-column-id', column.id);
-
-            const leadsInColumn = getLeadsForColumn(column.id);
-
-            columnDiv.innerHTML = `
-                <div class="column-header" style="background: ${column.color}">
-                    <span class="column-title">${column.title}</span>
-                    <span class="column-count">${leadsInColumn.length}</span>
-                </div>
-                <div class="column-body">
-                    ${leadsInColumn.map(lead => createLeadCard(lead)).join('')}
-                    <div class="add-lead-btn" onclick="openAddLeadModal('${column.id}')">
-                        ➕ Add Lead Here
-                    </div>
-                </div>
-            `;
-
-            return columnDiv;
-        }
-
-        function createLeadCard(lead) {
-            const assignedUser = allUsers.find(u => u.id === lead.assigned_to);
-            
-            return `
-                <div class="lead-card" data-lead-id="${lead.id}">
-                    <div class="lead-header">
-                        <div class="lead-name">
-                            ${lead.name}
-                            ${lead.crm_url ? `<button class="crm-icon" onclick="openCrmLink('${lead.crm_url}')" title="Open in CRM">👤</button>` : ''}
-                        </div>
-                        <div class="lead-actions">
-                            <button class="action-btn edit-btn" onclick="editLead(${lead.id})" title="Edit Lead">✏️</button>
-                            <button class="action-btn delete-btn" onclick="deleteLead(${lead.id})" title="Delete Lead">🗑️</button>
-                        </div>
-                    </div>
-                    <div class="lead-details">
-                        <div class="lead-detail-row">📧 ${lead.email}</div>
-                        ${lead.phone ? `<div class="lead-detail-row">📞 ${lead.phone}</div>` : ''}
-                        ${lead.vehicle_interest ? `<div class="lead-vehicle">🚗 ${lead.vehicle_interest}</div>` : ''}
-                        
-                        ${lead.next_followup_date ? `
-                            <div class="lead-followup">
-                                📅 Follow-up: ${formatDate(lead.next_followup_date)} ${lead.next_followup_time || ''}
-                            </div>
-                        ` : ''}
-                        
-                        ${lead.next_action ? `
-                            <div class="lead-next-action">
-                                ✅ Next: ${lead.next_action}
-                            </div>
-                        ` : ''}
-                        
-                        ${lead.priority && lead.priority !== 'medium' ? `
-                            <div class="lead-priority priority-${lead.priority}">
-                                ${lead.priority === 'high' ? '🔴 High Priority' : '🟡 Low Priority'}
-                            </div>
-                        ` : ''}
-                        
-                        ${assignedUser ? `<div class="lead-assigned">👤 ${assignedUser.name}</div>` : ''}
-                    </div>
-                    <div class="lead-meta">
-                        <span>${lead.source || 'Unknown'}</span>
-                        <span>${formatDate(lead.created_at)}</span>
-                    </div>
-                    
-                    <div class="lead-quick-actions">
-                        <button class="quick-action-btn" onclick="scheduleFollowup(${lead.id})" title="Schedule Follow-up">📅</button>
-                        <button class="quick-action-btn" onclick="addTask(${lead.id})" title="Add Task">✅</button>
-                        <button class="quick-action-btn" onclick="addNote(${lead.id})" title="Add Note">📝</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function getLeadsForColumn(columnId) {
-            let filteredLeads = allLeads.filter(lead => lead.status === columnId);
-            
-            // Apply user filter if selected
-            const userFilter = document.getElementById('userFilter')?.value;
-            if (userFilter) {
-                filteredLeads = filteredLeads.filter(lead => lead.assigned_to == userFilter);
-            }
-            
-            return filteredLeads;
-        }
-
-        // Modal functions
-        function openAddLeadModal(defaultStatus = 'new') {
-            currentEditingLead = null;
-            document.getElementById('leadModalTitle').textContent = 'Add New Lead';
-            document.getElementById('leadSubmitBtn').textContent = 'Add Lead';
-            document.getElementById('leadForm').reset();
-            document.getElementById('leadForm').setAttribute('data-default-status', defaultStatus);
-            
-            populateAssignOptions();
-            openModal('leadModal');
-        }
-
-        function editLead(leadId) {
-            const lead = allLeads.find(l => l.id == leadId);
-            if (!lead) return;
-            
-            currentEditingLead = lead;
-            document.getElementById('leadModalTitle').textContent = 'Edit Lead';
-            document.getElementById('leadSubmitBtn').textContent = 'Update Lead';
-            
-            // Populate form
-            document.getElementById('leadName').value = lead.name || '';
-            document.getElementById('leadEmail').value = lead.email || '';
-            document.getElementById('leadPhone').value = lead.phone || '';
-            document.getElementById('leadVehicle').value = lead.vehicle_interest || '';
-            document.getElementById('leadAssignedTo').value = lead.assigned_to || '';
-            document.getElementById('leadCrmUrl').value = lead.crm_url || '';
-            document.getElementById('leadSource').value = lead.source || 'website';
-            document.getElementById('leadPriority').value = lead.priority || 'medium';
-            document.getElementById('leadFollowupDate').value = lead.next_followup_date || '';
-            document.getElementById('leadFollowupTime').value = lead.next_followup_time || '';
-            document.getElementById('leadNextAction').value = lead.next_action || '';
-            
-            populateAssignOptions();
-            openModal('leadModal');
-        }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        // Form submission
-        function handleLeadSubmit(event) {
-            event.preventDefault();
-            
-            const defaultStatus = document.getElementById('leadForm').getAttribute('data-default-status') || 'new';
-            
-            const leadData = {
-                name: document.getElementById('leadName').value,
-                email: document.getElementById('leadEmail').value,
+        const name = document.getElementById('leadName').value;
+        const email = document.getElementById('leadEmail').value;
+        
+        if (name && email) {
+            const newLead = {
+                id: leadCounter++,
+                name: name,
+                email: email,
                 phone: document.getElementById('leadPhone').value,
                 vehicle_interest: document.getElementById('leadVehicle').value,
-                assigned_to: parseInt(document.getElementById('leadAssignedTo').value) || null,
-                crm_url: document.getElementById('leadCrmUrl').value,
-                source: document.getElementById('leadSource').value,
-                priority: document.getElementById('leadPriority').value,
-                next_followup_date: document.getElementById('leadFollowupDate').value || null,
-                next_followup_time: document.getElementById('leadFollowupTime').value || null,
-                next_action: document.getElementById('leadNextAction').value,
-                status: currentEditingLead ? currentEditingLead.status : defaultStatus
+                status: 'new',
+                crm_url: document.getElementById('leadCrmUrl').value
             };
-
-            if (currentEditingLead) {
-                // Update existing lead
-                Object.assign(currentEditingLead, leadData);
-                showAlert('Lead updated successfully!', 'success');
-            } else {
-                // Create new lead
-                leadData.id = ++leadIdCounter;
-                leadData.created_at = new Date().toISOString();
-                allLeads.push(leadData);
-                showAlert('Lead added successfully!', 'success');
-            }
             
-            renderPipeline();
-            closeModal('leadModal');
+            allLeads.push(newLead);
+            console.log('✅ Lead added:', newLead);
+            alert('✅ Lead added successfully!');
+            closeLeadModal();
+            renderBoard();
         }
+    };
+    
+    // Close modal buttons
+    document.getElementById('closeLeadModal').onclick = closeLeadModal;
+    document.getElementById('cancelLeadBtn').onclick = closeLeadModal;
+    
+    // Logout
+    document.getElementById('logoutBtn').onclick = function() {
+        if (confirm('Logout?')) window.location.href = '/';
+    };
+    
+    renderBoard();
+    console.log('✅ Dashboard initialized!');
+});
 
-        // Helper functions
-        function populateAssignOptions() {
-            const select = document.getElementById('leadAssignedTo');
-            select.innerHTML = '<option value="">Unassigned</option>';
-            
-            allUsers.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user.id;
-                option.textContent = user.name || user.email;
-                select.appendChild(option);
-            });
-        }
+function openLeadModal() {
+    document.getElementById('leadModal').classList.add('active');
+}
 
-        function updateUserFilterOptions() {
-            const select = document.getElementById('userFilter');
-            if (!select) return;
-            
-            select.innerHTML = '<option value="">All Team Members</option>';
-            
-            allUsers.forEach(user => {
-                const option = document.createElement('option');
-                option.value = user.id;
-                option.textContent = user.name || user.email;
-                select.appendChild(option);
-            });
-        }
+function closeLeadModal() {
+    document.getElementById('leadModal').classList.remove('active');
+    document.getElementById('leadForm').reset();
+}
 
-        function filterLeadsByUser() {
-            renderPipeline();
-        }
+function renderBoard() {
+    console.log('🎨 Rendering board with', allLeads.length, 'leads');
+    const board = document.getElementById('kanbanBoard');
+    board.innerHTML = '';
+    
+    pipelineColumns.forEach(column => {
+        const columnDiv = document.createElement('div');
+        columnDiv.className = 'kanban-column';
+        
+        const leadsInColumn = allLeads.filter(lead => lead.status === column.id);
+        
+        columnDiv.innerHTML = `
+            <div class="column-header" style="background: ${column.color}">
+                <span class="column-title">${column.title}</span>
+                <span class="column-count">${leadsInColumn.length}</span>
+            </div>
+            <div class="column-body">
+                ${leadsInColumn.map(lead => `
+                    <div class="lead-card" data-lead-id="${lead.id}">
+                        <div class="lead-header">
+                            <div class="lead-name">
+                                ${lead.name}
+                                ${lead.crm_url ? `<button class="crm-icon" onclick="openCrmLink('${lead.crm_url}')" title="Open in CRM">👤</button>` : ''}
+                            </div>
+                        </div>
+                        <div class="lead-details">
+                            <div class="lead-detail-row">📧 ${lead.email}</div>
+                            ${lead.phone ? `<div class="lead-detail-row">📞 ${lead.phone}</div>` : ''}
+                            ${lead.vehicle_interest ? `<div class="lead-vehicle">🚗 ${lead.vehicle_interest}</div>` : ''}
+                        </div>
+                    </div>
+                `).join('')}
+                <div class="add-lead-btn" onclick="openLeadModal()">
+                    ➕ Add Lead Here
+                </div>
+            </div>
+        `;
+        
+        board.appendChild(columnDiv);
+    });
+}
 
-        function formatDate(dateString) {
-            return new Date(dateString).toLocaleDateString('en-US', { 
-                month: 'short', 
-                day: 'numeric' 
-            });
-        }
+function openCrmLink(url) {
+    alert('🎉 Opening CRM: ' + url);
+    window.open(url, '_blank');
+}
 
-        function showAlert(message, type = 'success') {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type}`;
-            alertDiv.textContent = message;
-            
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 4000);
-        }
-
-        function openCrmLink(url) {
-            if (url) {
-                window.open(url, '_blank');
-                showAlert('Opening CRM record...', 'success');
-            }
-        }
-
-        function deleteLead(leadId) {
-            if (!confirm('Are you sure you want to delete this lead?')) return;
-            
-            const index = allLeads.findIndex(l => l.id == leadId);
-            if (index !== -1) {
-                allLeads.splice(index, 1);
-                renderPipeline();
-                showAlert('Lead deleted successfully!', 'success');
-            }
-        }
-
-        // Quick action functions
-        function scheduleFollowup(leadId) {
-            const date = prompt('Follow-up date (YYYY-MM-DD):');
-            const time = prompt('Follow-up time (HH:MM):');
-            
-            if (date) {
-                const lead = allLeads.find(l => l.id == leadId);
-                if (lead) {
-                    lead.next_followup_date = date;
-                    lead.next_followup_time = time;
-                    renderPipeline();
-                    showAlert('Follow-up scheduled!', 'success');
-                }
-            }
-        }
-
-        function addTask(leadId) {
-            const task = prompt('What task needs to be done?');
-            if (task) {
-                const lead = allLeads.find(l => l.id == leadId);
-                if (lead) {
-                    lead.next_action = task;
-                    renderPipeline();
-                    showAlert('Task added!', 'success');
-                }
-            }
-        }
-
-        function addNote(leadId) {
-            const note = prompt('Add a note:');
-            if (note) {
-                showAlert('Note added! (Feature can be enhanced)', 'success');
-            }
-        }
-
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                window.location.href = '/';
-            }
-        }
-
-        // Initialize app when page loads
-        document.addEventListener('DOMContentLoaded', initApp);
+console.log('📋 Kanban system loaded!');   
     </script>
 </body>
 </html>
