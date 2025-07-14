@@ -1,415 +1,248 @@
-<!DOCTYPE html>
+No trash can? No problem! 🔧
+🖊️ ALTERNATIVE: EDIT & REPLACE THE FILES
+Step 1: Replace dashboard.html
+
+Click on dashboard.html in your file list
+Click the pencil icon (✏️) at the top right (says "Edit this file")
+Select ALL the old content (Ctrl+A)
+Delete it all
+Paste this new content:
+
+html<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoClick Lead Pipeline</title>
+    <title>AutoClick Lead Management - Dashboard</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f6fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             color: #333;
-            overflow-x: auto;
         }
-        
+
         .header {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             padding: 1rem 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
         }
-        
+
         .logo {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: bold;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            color: #667eea;
         }
-        
-        .header-controls {
+
+        .header-info {
             display: flex;
             align-items: center;
             gap: 1rem;
+            color: #6c757d;
+            font-size: 0.9rem;
         }
-        
-        .user-filter {
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 0.25rem;
-            background: white;
-            min-width: 150px;
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
         }
-        
+
         .btn {
             padding: 0.5rem 1rem;
             border: none;
-            border-radius: 0.25rem;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 500;
+            transition: all 0.3s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            transition: all 0.2s;
-            font-size: 0.875rem;
         }
-        
+
         .btn-primary {
-            background: #3498db;
+            background: #667eea;
             color: white;
         }
-        
+
         .btn-primary:hover {
-            background: #2980b9;
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
-        
+
         .btn-secondary {
-            background: #95a5a6;
-            color: white;
+            background: #e9ecef;
+            color: #495057;
         }
-        
+
         .btn-secondary:hover {
-            background: #7f8c8d;
+            background: #dee2e6;
         }
-        
-        .btn-small {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.75rem;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            color: #7f8c8d;
-        }
-        
-        /* Kanban Board */
+
         .kanban-container {
-            padding: 1rem;
+            padding: 2rem;
             height: calc(100vh - 80px);
-            overflow: hidden;
+            overflow-x: auto;
         }
-        
+
         .kanban-board {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
+            min-width: fit-content;
             height: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding-bottom: 1rem;
         }
-        
+
         .kanban-column {
-            min-width: 280px;
-            max-width: 280px;
-            background: #ecf0f1;
-            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            width: 300px;
             display: flex;
             flex-direction: column;
-            flex-shrink: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
-        
+
         .column-header {
             padding: 1rem;
-            background: #34495e;
+            border-radius: 12px 12px 0 0;
             color: white;
-            border-radius: 0.5rem 0.5rem 0 0;
+            font-weight: 600;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            cursor: pointer;
-            user-select: none;
         }
-        
-        .column-header.editable {
-            background: #27ae60;
-        }
-        
-        .column-title {
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-        
+
         .column-count {
             background: rgba(255, 255, 255, 0.2);
             padding: 0.25rem 0.5rem;
-            border-radius: 0.75rem;
-            font-size: 0.75rem;
-            min-width: 1.5rem;
-            text-align: center;
+            border-radius: 12px;
+            font-size: 0.875rem;
         }
-        
+
         .column-body {
             flex: 1;
-            padding: 0.5rem;
+            padding: 1rem;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            min-height: 200px;
         }
-        
-        .column-body::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .column-body::-webkit-scrollbar-track {
-            background: #ecf0f1;
-        }
-        
-        .column-body::-webkit-scrollbar-thumb {
-            background: #bdc3c7;
-            border-radius: 3px;
-        }
-        
-        /* Lead Cards */
+
         .lead-card {
             background: white;
-            border-radius: 0.375rem;
-            padding: 0.75rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            border-left: 3px solid #3498db;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            cursor: grab;
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
         }
-        
+
         .lead-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
         }
-        
+
         .lead-card.dragging {
-            opacity: 0.6;
-            transform: rotate(2deg);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            opacity: 0.5;
+            transform: rotate(5deg);
         }
-        
+
         .lead-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.5rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
         }
-        
+
         .lead-name {
             font-weight: 600;
+            font-size: 1.1rem;
             color: #2c3e50;
-            font-size: 0.875rem;
-            line-height: 1.2;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
-        
+
         .crm-icon {
-            background: none;
+            background: #667eea;
+            color: white;
             border: none;
-            font-size: 1rem;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
             cursor: pointer;
-            padding: 0.125rem;
-            border-radius: 0.125rem;
-            transition: all 0.2s;
-        }
-        
-        .crm-icon:hover {
-            background: rgba(52, 152, 219, 0.1);
-            transform: scale(1.1);
-        }
-        
-        .lead-actions {
-            opacity: 0;
-            transition: opacity 0.2s;
-            display: flex;
-            gap: 0.25rem;
-        }
-        
-        .lead-card:hover .lead-actions {
-            opacity: 1;
-        }
-        
-        .action-btn {
-            background: none;
-            border: none;
-            padding: 0.125rem;
-            cursor: pointer;
-            border-radius: 0.125rem;
-            color: #7f8c8d;
-            font-size: 0.75rem;
-            width: 1.25rem;
-            height: 1.25rem;
+            font-size: 0.8rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s ease;
+            text-decoration: none;
         }
-        
-        .action-btn:hover {
-            background: #ecf0f1;
-            color: #2c3e50;
+
+        .crm-icon:hover {
+            background: #5a6fd8;
+            transform: scale(1.1);
         }
-        
-        .edit-btn:hover {
-            color: #f39c12;
-        }
-        
-        .delete-btn:hover {
-            color: #e74c3c;
-        }
-        
-        .lead-details {
-            font-size: 0.75rem;
-            color: #7f8c8d;
-            line-height: 1.3;
-        }
-        
-        .lead-detail-row {
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-        }
-        
+
         .lead-vehicle {
-            color: #3498db;
+            color: #495057;
             font-weight: 500;
-            margin-top: 0.25rem;
-        }
-        
-        .lead-followup {
-            background: #e8f4fd;
-            color: #2980b9;
+            margin-top: 0.5rem;
             padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.7rem;
-            margin: 0.25rem 0;
-        }
-        
-        .lead-next-action {
-            background: #e8f5e8;
-            color: #27ae60;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.7rem;
-            margin: 0.25rem 0;
-        }
-        
-        .lead-priority {
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin: 0.25rem 0;
-        }
-        
-        .priority-high {
-            background: #fdf2f2;
-            color: #e53e3e;
-        }
-        
-        .priority-low {
-            background: #fffbeb;
-            color: #d69e2e;
-        }
-        
-        .lead-assigned {
-            background: #e8f4fd;
-            color: #3498db;
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.75rem;
-            font-size: 0.625rem;
-            font-weight: 500;
-            margin-top: 0.375rem;
+            background: #f8f9fa;
+            border-radius: 4px;
             display: inline-block;
         }
-        
+
         .lead-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 0.5rem;
-            padding-top: 0.375rem;
-            border-top: 1px solid #ecf0f1;
-            font-size: 0.625rem;
-            color: #95a5a6;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #e9ecef;
+            font-size: 0.8rem;
+            color: #6c757d;
         }
-        
-        .lead-quick-actions {
-            display: flex;
-            gap: 0.25rem;
-            margin-top: 0.5rem;
-            padding-top: 0.5rem;
-            border-top: 1px solid #ecf0f1;
-            opacity: 0;
-            transition: opacity 0.2s;
+
+        .priority-high {
+            border-left-color: #dc3545;
         }
-        
-        .lead-card:hover .lead-quick-actions {
-            opacity: 1;
+
+        .priority-medium {
+            border-left-color: #ffc107;
         }
-        
-        .quick-action-btn {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 0.25rem;
-            padding: 0.25rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            transition: all 0.2s;
-            flex: 1;
+
+        .priority-low {
+            border-left-color: #28a745;
+        }
+
+        .add-lead-placeholder {
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
             text-align: center;
-        }
-        
-        .quick-action-btn:hover {
-            background: #e9ecef;
-            border-color: #3498db;
-        }
-        
-        /* Add Lead Button */
-        .add-lead-btn {
-            background: #ecf0f1;
-            border: 2px dashed #bdc3c7;
-            border-radius: 0.375rem;
-            padding: 0.75rem;
-            text-align: center;
+            color: #6c757d;
             cursor: pointer;
-            color: #7f8c8d;
-            font-size: 0.75rem;
-            font-weight: 500;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
         }
-        
-        .add-lead-btn:hover {
-            background: #d5dbdb;
-            border-color: #95a5a6;
-            color: #2c3e50;
+
+        .add-lead-placeholder:hover {
+            border-color: #667eea;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
         }
-        
-        /* Drag and Drop */
-        .column-drop-zone {
-            min-height: 2rem;
-            border-radius: 0.375rem;
-            transition: all 0.2s;
-        }
-        
-        .column-drop-zone.drag-over {
-            background: rgba(52, 152, 219, 0.1);
-            border: 2px dashed #3498db;
-        }
-        
-        /* Modals */
+
         .modal {
             display: none;
             position: fixed;
@@ -418,246 +251,245 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            overflow-y: auto;
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
-        
+
         .modal.active {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
         }
-        
+
         .modal-content {
             background: white;
-            border-radius: 0.5rem;
+            border-radius: 12px;
             padding: 2rem;
+            width: 90%;
             max-width: 500px;
-            width: 100%;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         }
-        
+
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #ecf0f1;
+            margin-bottom: 2rem;
         }
-        
+
         .modal-title {
-            font-size: 1.125rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: #2c3e50;
         }
-        
+
         .close-btn {
             background: none;
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: #95a5a6;
+            color: #6c757d;
             padding: 0;
-            width: 2rem;
-            height: 2rem;
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 0.25rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
         }
-        
+
         .close-btn:hover {
-            background: #ecf0f1;
-            color: #7f8c8d;
+            background: #f8f9fa;
+            color: #495057;
         }
-        
+
         .form-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
-        
+
         .form-label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
-            color: #2c3e50;
-            font-size: 0.875rem;
+            color: #495057;
         }
-        
+
         .form-input {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 0.25rem;
-            font-size: 0.875rem;
-            transition: border-color 0.2s;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
-        
+
         .form-input:focus {
             outline: none;
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
-        
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
         .form-actions {
             display: flex;
-            gap: 0.75rem;
+            gap: 1rem;
             justify-content: flex-end;
             margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #ecf0f1;
         }
-        
-        /* Responsive */
+
+        .drop-zone {
+            min-height: 100px;
+            border: 2px dashed transparent;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone.drag-over {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 10000;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .success-message.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        .error {
+            text-align: center;
+            padding: 2rem;
+            color: #dc3545;
+        }
+
         @media (max-width: 768px) {
-            .header {
-                padding: 0.75rem 1rem;
-                flex-direction: column;
-                gap: 0.75rem;
-            }
-            
-            .header-controls {
-                width: 100%;
-                justify-content: space-between;
-            }
-            
             .kanban-container {
-                padding: 0.5rem;
-                height: calc(100vh - 120px);
+                padding: 1rem;
             }
             
             .kanban-column {
-                min-width: 260px;
-                max-width: 260px;
+                width: 280px;
             }
-        }
-        
-        /* Loading and alerts */
-        .alert {
-            position: fixed;
-            top: 1rem;
-            right: 1rem;
-            padding: 0.75rem 1rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            z-index: 3000;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            
+            .header {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">
-            🚗 AutoClick Lead Pipeline
+    <header class="header">
+        <div class="logo">🚗 AutoClick Lead Management</div>
+        <div class="header-info">
+            <span id="userInfo">Loading...</span>
+            <span id="dealershipInfo">Loading...</span>
         </div>
         <div class="header-controls">
-            <select class="user-filter" id="userFilter">
-                <option value="">All Team Members</option>
-            </select>
-            <button class="btn btn-primary" id="addLeadBtn">
+            <button id="addLeadBtn" class="btn btn-primary">
                 ➕ Add Lead
             </button>
-            <button class="btn btn-secondary" id="addUserBtn" style="display: none;">
-                👤 Add User
+            <button id="logoutBtn" class="btn btn-secondary">
+                Logout
             </button>
-            <div class="user-info">
-                <span>👋 <strong id="userName">User</strong></span>
-                <button class="btn btn-secondary btn-small" id="logoutBtn">Logout</button>
-            </div>
         </div>
-    </div>
+    </header>
 
     <div class="kanban-container">
         <div id="kanbanBoard" class="kanban-board">
-            <!-- Columns will be dynamically generated -->
+            <div class="loading">
+                <p>Loading leads...</p>
+            </div>
         </div>
     </div>
 
-    <!-- Add/Edit Lead Modal -->
+    <!-- Add Lead Modal -->
     <div id="leadModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="leadModalTitle">Add New Lead</h3>
-                <button class="close-btn" id="closeLeadModal">&times;</button>
+                <h2 class="modal-title">Add New Lead</h2>
+                <button id="closeModalBtn" class="close-btn">&times;</button>
             </div>
             <form id="leadForm">
                 <div class="form-group">
-                    <label class="form-label">Lead Name *</label>
-                    <input type="text" class="form-input" id="leadName" required placeholder="John Smith">
+                    <label class="form-label" for="leadName">Customer Name *</label>
+                    <input type="text" id="leadName" class="form-input" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Email *</label>
-                    <input type="email" class="form-input" id="leadEmail" required placeholder="john@example.com">
+                    <label class="form-label" for="leadEmail">Email *</label>
+                    <input type="email" id="leadEmail" class="form-input" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="tel" class="form-input" id="leadPhone" placeholder="(555) 123-4567">
+                    <label class="form-label" for="leadPhone">Phone</label>
+                    <input type="tel" id="leadPhone" class="form-input">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Vehicle Interest</label>
-                    <input type="text" class="form-input" id="leadVehicle" placeholder="2024 Honda CR-V">
+                    <label class="form-label" for="leadVehicle">Vehicle Interest</label>
+                    <input type="text" id="leadVehicle" class="form-input" placeholder="2024 Honda CR-V">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Assign to Sales Rep</label>
-                    <select class="form-input" id="leadAssignedTo">
-                        <option value="">Unassigned</option>
+                    <label class="form-label" for="leadCrmUrl">CRM URL</label>
+                    <input type="url" id="leadCrmUrl" class="form-input" placeholder="https://your-crm.com/contact/123">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="leadCrmId">CRM Client ID</label>
+                    <input type="text" id="leadCrmId" class="form-input" placeholder="CRM123">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="leadPriority">Priority</label>
+                    <select id="leadPriority" class="form-select">
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                        <option value="low">Low</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">CRM Record URL</label>
-                    <input type="url" class="form-input" id="leadCrmUrl" placeholder="https://your-crm.com/contact/123">
-                    <small style="color: #7f8c8d; font-size: 0.75rem;">Link to this lead's record in your CRM system</small>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Priority Level</label>
-                    <select class="form-input" id="leadPriority">
-                        <option value="medium">Medium Priority</option>
-                        <option value="high">High Priority</option>
-                        <option value="low">Low Priority</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Next Follow-up Date</label>
-                    <input type="date" class="form-input" id="leadFollowupDate">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Follow-up Time</label>
-                    <input type="time" class="form-input" id="leadFollowupTime">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Next Action Needed</label>
-                    <input type="text" class="form-input" id="leadNextAction" placeholder="Call to schedule demo">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Lead Source</label>
-                    <select class="form-input" id="leadSource">
-                        <option value="website">Website</option>
-                        <option value="email">Email</option>
-                        <option value="phone">Phone Call</option>
-                        <option value="referral">Referral</option>
-                        <option value="walk-in">Walk-in</option>
-                        <option value="social">Social Media</option>
-                        <option value="advertising">Advertising</option>
-                    </select>
+                    <label class="form-label" for="leadNotes">Notes</label>
+                    <textarea id="leadNotes" class="form-input" rows="3"></textarea>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-secondary" id="cancelLeadBtn">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="leadSubmitBtn">Add Lead</button>
+                    <button type="button" id="cancelBtn" class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Lead</button>
                 </div>
             </form>
         </div>
@@ -665,130 +497,361 @@
 
     <script>
         // Global variables
-     let allLeads = [
-    {id: 1, name: 'John Smith', email: 'john@example.com', phone: '(555) 123-4567', vehicle_interest: '2024 Honda CR-V', status: 'new', crm_url: 'https://your-crm.com/contact/12345'},
-    {id: 2, name: 'Sarah Johnson', email: 'sarah@example.com', phone: '(555) 987-6543', vehicle_interest: '2024 Toyota Camry', status: 'contacted'}
-];
+        let currentUser = null;
+        let allLeads = [];
+        let pipelineColumns = [];
+        let draggedLead = null;
 
-let pipelineColumns = [
-    { id: 'new', title: 'New Leads', color: '#3498db' },
-    { id: 'contacted', title: 'Contacted', color: '#9b59b6' },
-    { id: 'qualified', title: 'Qualified', color: '#f39c12' },
-    { id: 'demo', title: 'Demo Scheduled', color: '#e67e22' },
-    { id: 'proposal', title: 'Proposal Sent', color: '#e74c3c' },
-    { id: 'negotiating', title: 'Negotiating', color: '#34495e' },
-    { id: 'closed_won', title: 'Closed Won', color: '#27ae60' },
-    { id: 'closed_lost', title: 'Closed Lost', color: '#95a5a6' }
-];
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Check authentication
+                const token = localStorage.getItem('token');
+                const userData = localStorage.getItem('user');
+                
+                if (!token || !userData) {
+                    window.location.href = '/';
+                    return;
+                }
+                
+                currentUser = JSON.parse(userData);
+                
+                // Update header info
+                document.getElementById('userInfo').textContent = `👤 ${currentUser.name} (${currentUser.role})`;
+                document.getElementById('dealershipInfo').textContent = `🏢 ${currentUser.dealership}`;
+                
+                // Setup event listeners
+                setupEventListeners();
+                
+                // Load data
+                await loadPipelineColumns();
+                await loadLeads();
+                
+                renderBoard();
+                
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                showError('Failed to load dashboard');
+            }
+        });
 
-let leadCounter = 3;
+        function setupEventListeners() {
+            // Add Lead button
+            document.getElementById('addLeadBtn').addEventListener('click', openLeadModal);
+            
+            // Modal controls
+            document.getElementById('closeModalBtn').addEventListener('click', closeLeadModal);
+            document.getElementById('cancelBtn').addEventListener('click', closeLeadModal);
+            
+            // Form submission
+            document.getElementById('leadForm').addEventListener('submit', handleFormSubmit);
+            
+            // Logout
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            
+            // Close modal when clicking outside
+            document.getElementById('leadModal').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) {
+                    closeLeadModal();
+                }
+            });
+        }
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Dashboard loading...');
-    
-    // Add Lead button
-    document.getElementById('addLeadBtn').onclick = function() {
-        console.log('Add Lead clicked');
-        openLeadModal();
-    };
-    
-    // Form submission
-    document.getElementById('leadForm').onsubmit = function(e) {
-        e.preventDefault();
-        console.log('Form submitted');
-        
-        const name = document.getElementById('leadName').value;
-        const email = document.getElementById('leadEmail').value;
-        
-        if (name && email) {
-            const newLead = {
-                id: leadCounter++,
-                name: name,
-                email: email,
-                phone: document.getElementById('leadPhone').value,
-                vehicle_interest: document.getElementById('leadVehicle').value,
-                status: 'new',
-                crm_url: document.getElementById('leadCrmUrl').value
+        async function apiCall(endpoint, options = {}) {
+            const token = localStorage.getItem('token');
+            
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
             };
             
-            allLeads.push(newLead);
-            console.log('✅ Lead added:', newLead);
-            alert('✅ Lead added successfully!');
-            closeLeadModal();
-            renderBoard();
+            const response = await fetch(endpoint, { ...defaultOptions, ...options });
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/';
+                return;
+            }
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Request failed');
+            }
+            
+            return response.json();
         }
-    };
-    
-    // Close modal buttons
-    document.getElementById('closeLeadModal').onclick = closeLeadModal;
-    document.getElementById('cancelLeadBtn').onclick = closeLeadModal;
-    
-    // Logout
-    document.getElementById('logoutBtn').onclick = function() {
-        if (confirm('Logout?')) window.location.href = '/';
-    };
-    
-    renderBoard();
-    console.log('✅ Dashboard initialized!');
-});
 
-function openLeadModal() {
-    document.getElementById('leadModal').classList.add('active');
-}
+        async function loadPipelineColumns() {
+            try {
+                pipelineColumns = await apiCall('/api/pipeline/columns');
+            } catch (error) {
+                console.error('Failed to load pipeline columns:', error);
+                // Use default columns
+                pipelineColumns = [
+                    { id: 'new', title: 'New Leads', color: '#3498db', position: 1 },
+                    { id: 'contacted', title: 'Contacted', color: '#9b59b6', position: 2 },
+                    { id: 'qualified', title: 'Qualified', color: '#f39c12', position: 3 },
+                    { id: 'demo', title: 'Demo Scheduled', color: '#e67e22', position: 4 },
+                    { id: 'proposal', title: 'Proposal Sent', color: '#e74c3c', position: 5 },
+                    { id: 'negotiating', title: 'Negotiating', color: '#34495e', position: 6 },
+                    { id: 'closed_won', title: 'Closed Won', color: '#27ae60', position: 7 },
+                    { id: 'closed_lost', title: 'Closed Lost', color: '#95a5a6', position: 8 }
+                ];
+            }
+        }
 
-function closeLeadModal() {
-    document.getElementById('leadModal').classList.remove('active');
-    document.getElementById('leadForm').reset();
-}
+        async function loadLeads() {
+            try {
+                allLeads = await apiCall('/api/leads');
+            } catch (error) {
+                console.error('Failed to load leads:', error);
+                showError('Failed to load leads');
+                allLeads = [];
+            }
+        }
 
-function renderBoard() {
-    console.log('🎨 Rendering board with', allLeads.length, 'leads');
-    const board = document.getElementById('kanbanBoard');
-    board.innerHTML = '';
-    
-    pipelineColumns.forEach(column => {
-        const columnDiv = document.createElement('div');
-        columnDiv.className = 'kanban-column';
-        
-        const leadsInColumn = allLeads.filter(lead => lead.status === column.id);
-        
-        columnDiv.innerHTML = `
-            <div class="column-header" style="background: ${column.color}">
-                <span class="column-title">${column.title}</span>
-                <span class="column-count">${leadsInColumn.length}</span>
-            </div>
-            <div class="column-body">
-                ${leadsInColumn.map(lead => `
-                    <div class="lead-card" data-lead-id="${lead.id}">
-                        <div class="lead-header">
-                            <div class="lead-name">
-                                ${lead.name}
-                                ${lead.crm_url ? `<button class="crm-icon" onclick="openCrmLink('${lead.crm_url}')" title="Open in CRM">👤</button>` : ''}
-                            </div>
-                        </div>
-                        <div class="lead-details">
-                            <div class="lead-detail-row">📧 ${lead.email}</div>
-                            ${lead.phone ? `<div class="lead-detail-row">📞 ${lead.phone}</div>` : ''}
-                            ${lead.vehicle_interest ? `<div class="lead-vehicle">🚗 ${lead.vehicle_interest}</div>` : ''}
+        function renderBoard() {
+            const board = document.getElementById('kanbanBoard');
+            board.innerHTML = '';
+
+            pipelineColumns.forEach(column => {
+                const leadsInColumn = allLeads.filter(lead => lead.status === column.id || lead.status === column.column_id);
+                
+                const columnDiv = document.createElement('div');
+                columnDiv.className = 'kanban-column';
+                columnDiv.dataset.status = column.id || column.column_id;
+
+                columnDiv.innerHTML = `
+                    <div class="column-header" style="background: ${column.color}">
+                        <span class="column-title">${column.title}</span>
+                        <span class="column-count">${leadsInColumn.length}</span>
+                    </div>
+                    <div class="column-body drop-zone" data-status="${column.id || column.column_id}">
+                        ${leadsInColumn.map(lead => createLeadCard(lead)).join('')}
+                        <div class="add-lead-placeholder" onclick="openLeadModal()">
+                            ➕ Add Lead Here
                         </div>
                     </div>
-                `).join('')}
-                <div class="add-lead-btn" onclick="openLeadModal()">
-                    ➕ Add Lead Here
+                `;
+
+                board.appendChild(columnDiv);
+            });
+
+            // Setup drag and drop
+            initializeDragAndDrop();
+        }
+
+        function createLeadCard(lead) {
+            const priorityClass = `priority-${lead.priority}`;
+            
+            return `
+                <div class="lead-card ${priorityClass}" data-lead-id="${lead.id}" draggable="true">
+                    <div class="lead-header">
+                        <div class="lead-name">
+                            ${lead.name}
+                            ${lead.crm_url ? `<a href="${lead.crm_url}" target="_blank" class="crm-icon" title="Open in CRM">👤</a>` : ''}
+                        </div>
+                    </div>
+                    ${lead.vehicle_interest ? `<div class="lead-vehicle">🚗 ${lead.vehicle_interest}</div>` : ''}
+                    <div class="lead-meta">
+                        <div>📊 ${capitalizeFirst(lead.priority)} Priority</div>
+                        ${lead.assigned_to_name ? `<div>👤 ${lead.assigned_to_name}</div>` : ''}
+                        <div>📅 ${formatDate(lead.created_at)}</div>
+                    </div>
                 </div>
-            </div>
-        `;
-        
-        board.appendChild(columnDiv);
-    });
-}
+            `;
+        }
 
-function openCrmLink(url) {
-    alert('🎉 Opening CRM: ' + url);
-    window.open(url, '_blank');
-}
+        function initializeDragAndDrop() {
+            const leadCards = document.querySelectorAll('.lead-card');
+            const dropZones = document.querySelectorAll('.drop-zone');
 
-console.log('📋 Kanban system loaded!');   
+            leadCards.forEach(card => {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+                zone.addEventListener('dragenter', handleDragEnter);
+                zone.addEventListener('dragleave', handleDragLeave);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedLead = e.target;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedLead = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            e.preventDefault();
+            if (e.target.classList.contains('drop-zone')) {
+                e.target.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            if (e.target.classList.contains('drop-zone')) {
+                e.target.classList.remove('drag-over');
+            }
+        }
+
+        async function handleDrop(e) {
+            e.preventDefault();
+            
+            if (!draggedLead) return;
+            
+            const dropZone = e.target.closest('.drop-zone');
+            if (!dropZone) return;
+            
+            dropZone.classList.remove('drag-over');
+            
+            const newStatus = dropZone.dataset.status;
+            const leadId = parseInt(draggedLead.dataset.leadId);
+            
+            const lead = allLeads.find(l => l.id === leadId);
+            if (lead && lead.status !== newStatus) {
+                try {
+                    await apiCall(`/api/leads/${leadId}/status`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ status: newStatus })
+                    });
+                    
+                    // Update local data
+                    lead.status = newStatus;
+                    
+                    showSuccess(`✅ ${lead.name} moved to ${getStatusText(newStatus)}`);
+                    renderBoard();
+                    
+                } catch (error) {
+                    console.error('Failed to update lead status:', error);
+                    showError('Failed to update lead status');
+                }
+            }
+        }
+
+        function openLeadModal() {
+            document.getElementById('leadModal').classList.add('active');
+            document.getElementById('leadName').focus();
+        }
+
+        function closeLeadModal() {
+            document.getElementById('leadModal').classList.remove('active');
+            document.getElementById('leadForm').reset();
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('leadName').value.trim(),
+                email: document.getElementById('leadEmail').value.trim(),
+                phone: document.getElementById('leadPhone').value.trim(),
+                vehicle_interest: document.getElementById('leadVehicle').value.trim(),
+                crm_url: document.getElementById('leadCrmUrl').value.trim(),
+                crm_client_id: document.getElementById('leadCrmId').value.trim(),
+                priority: document.getElementById('leadPriority').value,
+                notes: document.getElementById('leadNotes').value.trim()
+            };
+
+            if (!formData.name || !formData.email) {
+                showError('Name and email are required');
+                return;
+            }
+
+            try {
+                const newLead = await apiCall('/api/leads', {
+                    method: 'POST',
+                    body: JSON.stringify(formData)
+                });
+                
+                allLeads.push(newLead);
+                showSuccess(`✅ Lead "${newLead.name}" added successfully!`);
+                closeLeadModal();
+                renderBoard();
+                
+            } catch (error) {
+                console.error('Failed to create lead:', error);
+                showError('Failed to create lead: ' + error.message);
+            }
+        }
+
+        function handleLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
+
+        // Utility functions
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric'
+            });
+        }
+
+        function getStatusText(status) {
+            const column = pipelineColumns.find(col => (col.id || col.column_id) === status);
+            return column ? column.title : status;
+        }
+
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            document.body.appendChild(successDiv);
+            
+            setTimeout(() => successDiv.classList.add('show'), 100);
+            
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+                setTimeout(() => document.body.removeChild(successDiv), 300);
+            }, 3000);
+        }
+
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #dc3545;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                z-index: 10000;
+                font-weight: 500;
+            `;
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => document.body.removeChild(errorDiv), 5000);
+        }
+
+        // Global functions for inline handlers
+        window.openLeadModal = openLeadModal;
     </script>
 </body>
 </html>
